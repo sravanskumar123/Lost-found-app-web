@@ -8,7 +8,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const upload = multer({ dest: path.join(__dirname, '../uploads/temp') });
 
 router.post('/', authMiddleware, upload.single('image'), itemsController.createItem);
-router.get('/', itemsController.getItems);
+router.get('/', authMiddleware.optionalAuth, itemsController.getItems);
 router.get('/my', authMiddleware, itemsController.getMyItems);
 router.get('/potential-matches', itemsController.getPotentialMatches);
 router.get('/:item_id/matches', itemsController.getItemMatches);

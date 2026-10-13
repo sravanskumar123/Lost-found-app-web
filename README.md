@@ -3,7 +3,10 @@
 A full-stack, intelligent lost-and-found management portal designed for academic campuses and university communities.
 
 > 📖 **Full Engineering & Architecture Documentation:**  
-> Please see [PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md) for the complete system architecture, database schema, matching algorithms, API specifications, and design system.
+> Please see [PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md) for the complete system architecture, database schema, matching algorithms, API specifications, and design system.  
+>  
+> 📊 **System Deliverables & Output Specifications:**  
+> Please see [OUTPUT.md](./OUTPUT.md) for full details on all visual UI screens, REST API JSON payloads, match calculation outputs, lifecycle stepper states, database table records, and CLI logs.
 
 ---
 

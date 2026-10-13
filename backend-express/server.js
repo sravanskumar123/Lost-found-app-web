@@ -27,6 +27,23 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Root API welcome endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Campus Recovery API is running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      auth: ['/check-email', '/register', '/login', '/me'],
+      items: '/items',
+      claims: '/claims',
+      admin: '/admin'
+    },
+    frontend: 'http://localhost:5173'
+  });
+});
+
 // Authentication routes
 app.use('/', authRoutes);
 app.use('/items', itemsRoutes);

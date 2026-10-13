@@ -88,6 +88,7 @@ exports.login = async (req, res) => {
         return res.json({
             access_token: token,
             token_type: "bearer",
+            id: user.id,
             role: user.role,
             email: user.email,
             name: user.name

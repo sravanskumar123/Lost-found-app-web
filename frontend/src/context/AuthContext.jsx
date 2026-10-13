@@ -12,17 +12,20 @@ export const AuthProvider = ({ children }) => {
     const role = localStorage.getItem('role');
     const email = localStorage.getItem('email');
     const name = localStorage.getItem('name');
+    const id = localStorage.getItem('userId');
     if (token) {
-      setUser({ token, role, email, name });
+      setUser({ token, role, email, name, id: id ? parseInt(id) : null });
       api.get('/me')
         .then(res => {
           if (res.data) {
             setUser(prev => ({
               ...prev,
+              id: res.data.id || prev?.id,
               name: res.data.name || prev?.name,
               email: res.data.email || prev?.email,
               role: res.data.role || prev?.role
             }));
+            if (res.data.id) localStorage.setItem('userId', res.data.id);
             if (res.data.name) localStorage.setItem('name', res.data.name);
             if (res.data.email) localStorage.setItem('email', res.data.email);
           }
@@ -36,9 +39,11 @@ export const AuthProvider = ({ children }) => {
     const res = await api.post('/login', { email, password });
     localStorage.setItem('token', res.data.access_token);
     localStorage.setItem('role', res.data.role);
+    if (res.data.id) localStorage.setItem('userId', res.data.id);
     if (res.data.email) localStorage.setItem('email', res.data.email);
     if (res.data.name) localStorage.setItem('name', res.data.name);
     setUser({ 
+      id: res.data.id,
       token: res.data.access_token, 
       role: res.data.role, 
       email: res.data.email || email, 
@@ -52,6 +57,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('role');
     localStorage.removeItem('email');
     localStorage.removeItem('name');
+    localStorage.removeItem('userId');
     setUser(null);
   };
 

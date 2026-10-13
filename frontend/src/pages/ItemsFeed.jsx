@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import api from '../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import CampusMapView from '../components/CampusMapView';
+import { AuthContext } from '../context/AuthContext';
 
 function ItemsFeed() {
+  const { user } = useContext(AuthContext);
   const [allItems, setAllItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,16 +19,20 @@ function ItemsFeed() {
   useEffect(() => {
     fetchItems();
     getUserLocation();
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     applyFilter();
-  }, [search, selectedCategory, selectedType, allItems]);
+  }, [search, selectedCategory, selectedType, allItems, user?.id]);
 
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/items?status=active');
+      const params = { status: 'active' };
+      if (user?.id) {
+        params.exclude_user_id = user.id;
+      }
+      const res = await api.get('/items', { params });
       const items = Array.isArray(res.data) ? res.data : [];
       setAllItems(items);
       setFilteredItems(items);
@@ -83,6 +89,11 @@ function ItemsFeed() {
   const applyFilter = () => {
     const query = search.trim().toLowerCase();
     const results = allItems.filter(item => {
+      // Exclude items personally reported by the logged-in user
+      if (user?.id && item.user_id === user.id) {
+        return false;
+      }
+
       const title = (item.title || "").toLowerCase();
       const location = (item.location_name || "").toLowerCase();
       const category = (item.category || "").toLowerCase();
@@ -143,6 +154,47 @@ function ItemsFeed() {
           </Link>
         </div>
       </div>
+
+      {/* Notice Banner when logged in */}
+      {user && (
+        <div style={{
+          background: 'linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%)',
+          border: '1px solid #bbf7d0',
+          borderRadius: 14,
+          padding: '12px 18px',
+          marginBottom: 20,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 10,
+          fontSize: 13,
+          color: '#166534'
+        }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 500 }}>
+            <span className="material-icons" style={{ fontSize: 18, color: '#15803d' }}>visibility</span>
+            Showing items found and reported by others across campus. Your own reported items are stored separately.
+          </span>
+          <Link 
+            to="/my-items" 
+            style={{ 
+              color: '#15803d', 
+              fontWeight: 800, 
+              textDecoration: 'none', 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 4,
+              background: 'white',
+              padding: '5px 12px',
+              borderRadius: 8,
+              border: '1px solid #bbf7d0',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            }}
+          >
+            Manage My Items <span className="material-icons" style={{ fontSize: 16 }}>arrow_forward</span>
+          </Link>
+        </div>
+      )}
 
       {/* Desktop Search & Filter Card */}
       <div style={{

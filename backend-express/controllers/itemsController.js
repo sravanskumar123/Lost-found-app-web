@@ -88,6 +88,15 @@ exports.getItems = async (req, res) => {
 
         const params = [];
 
+        // Exclude items reported by the current user so they only see notices found/reported by others
+        if (req.user && req.user.id) {
+            query += " AND i.user_id != ?";
+            params.push(req.user.id);
+        } else if (req.query.exclude_user_id) {
+            query += " AND i.user_id != ?";
+            params.push(parseInt(req.query.exclude_user_id));
+        }
+
         if (type) {
             query += " AND LOWER(i.type) = LOWER(?)";
             params.push(type);
